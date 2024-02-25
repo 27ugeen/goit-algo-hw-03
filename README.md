@@ -11,7 +11,7 @@ Replace `source_dir` with the path to the source directory, and `[dest_dir]` (op
 
 If not provided, the destination directory will be named `dist`.
 
-Note: On Mac, you might need to use python3 instead of python to run the script.
+Note: On Mac, you might need to use `python3` instead of `python` to run the script.
 For example:
 
 `python3 copy_files.py /Users/userName/Documents/source_dir`
