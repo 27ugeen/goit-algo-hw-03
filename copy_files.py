@@ -1,36 +1,43 @@
-import os
+from pathlib import Path
 import shutil
 import sys
 
 def copy_files(source_dir, dest_dir):
     try:
         # Iterate over items in the source directory
-        for item in os.listdir(source_dir):
-            item_path = os.path.join(source_dir, item)
-            if os.path.isdir(item_path):
+        for item in source_dir.iterdir():
+            if item.is_dir():
                 # Recursively call the function if item is a directory
-                copy_files(item_path, dest_dir)
-            elif os.path.isfile(item_path):
+                copy_files(item, dest_dir)
+            elif item.is_file():
                 # Get the file extension
-                _, extension = os.path.splitext(item)
+                extension = item.suffix
                 # Create subdirectory based on file extension
-                subdirectory = os.path.join(dest_dir, extension[1:])
-                os.makedirs(subdirectory, exist_ok=True)
+                subdirectory = dest_dir / extension[1:]
+                subdirectory.mkdir(parents=True, exist_ok=True)
                 # Copy file to corresponding subdirectory
-                shutil.copy2(item_path, subdirectory)
+                shutil.copy2(str(item), str(subdirectory))
     except Exception as e:
         print(f"Error: {e}")
 
 def main():
     # Parsing command line arguments
     if len(sys.argv) < 2:
-        print("Usage: python script.py source_dir [dest_dir]")
+        print("Usage: python3 script.py source_dir [dest_dir]")
+        print("Note: The source_dir should be the path to the source directory.")
+        print("      The dest_dir (optional) should be the path to the destination directory.")
         sys.exit(1)
     
-    source_dir = sys.argv[1]
-    dest_dir = sys.argv[2] if len(sys.argv) > 2 else "dist"
+    # Get the current directory
+    current_dir = Path.cwd()
     
-    if not os.path.exists(source_dir):
+    # Form the full path of the source directory
+    source_dir = Path(sys.argv[1]).resolve()
+    
+    # Form the full path of the destination directory
+    dest_dir = Path(sys.argv[2]).resolve() if len(sys.argv) > 2 else current_dir / "dist"
+    
+    if not source_dir.exists():
         print(f"Error: Source directory '{source_dir}' does not exist.")
         sys.exit(1)
     
